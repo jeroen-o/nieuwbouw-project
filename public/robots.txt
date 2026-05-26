@@ -1,0 +1,16 @@
+# Robots — vervang example.nl door je eigen domein
+User-agent: *
+Allow: /
+
+# AI scrapers — toestaan of blokkeren naar smaak
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Sitemap
+Sitemap: https://example.nl/sitemap.xml

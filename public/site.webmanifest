@@ -1,0 +1,16 @@
+{
+  "name": "Dossiercompleet + IBL Hypotheekcheck",
+  "short_name": "Hypotheekcheck",
+  "description": "Bereken je maximale hypotheek 2026 conform NIBUD/AFM en IBL-rekenregels 8.1.1.",
+  "lang": "nl-NL",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F1EA",
+  "theme_color": "#0C3B2A",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
