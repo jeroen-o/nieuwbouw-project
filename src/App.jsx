@@ -479,54 +479,22 @@ export default function App() {
         </div>
       </header>
 
-      {/* Dossier acties (bewaren / uploaden / printen) */}
-      <div className="dossier-toolbar">
-        <div className="container dossier-toolbar-inner">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json,.json"
-            onChange={handleUploadDossier}
-            style={{ display: 'none' }}
-            aria-hidden="true"
-          />
-          <button
-            type="button"
-            className="dossier-action"
-            onClick={triggerUpload}
-            title="Een eerder bewaard dossier-bestand inladen"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Upload dossier
-          </button>
-          <button
-            type="button"
-            className="dossier-action"
-            onClick={handleSaveDossier}
-            title="Sla het huidige dossier op als bestand"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Bewaar dossier
-          </button>
-          {showResult && (
-            <button
-              type="button"
-              className="dossier-action dossier-action-print"
-              onClick={() => window.print()}
-              title="Druk het rapport af of bewaar als PDF"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
-              </svg>
-              Print rapport
-            </button>
-          )}
-        </div>
-      </div>
+      {/* Verborgen file-input voor upload — gedeeld door beide toolbars */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json,.json"
+        onChange={handleUploadDossier}
+        style={{ display: 'none' }}
+        aria-hidden="true"
+      />
+
+      {/* Sticky toolbar boven (volgt mee bij scrollen) */}
+      <DossierToolbar
+        showResult={showResult}
+        triggerUpload={triggerUpload}
+        handleSaveDossier={handleSaveDossier}
+      />
 
       {/* === INTAKE: keuze digitaal vs handmatig vóór de rest === */}
       {intakeMode !== 'sections' && (
@@ -1259,24 +1227,70 @@ export default function App() {
         </div>
       </section>
 
+      {/* Tweede toolbar onderaan de pagina */}
+      <DossierToolbar
+        variant="bottom"
+        showResult={showResult}
+        triggerUpload={triggerUpload}
+        handleSaveDossier={handleSaveDossier}
+      />
+
       <div className="footer-note">
         Dossiercompleet + IBL · indicatief instrument · geen financieel advies
       </div>
 
       {/* IBL detail modal */}
       <IblDetailModal iblData={iblModalData} onClose={() => setIblModalData(null)} />
-
-      {/* Print-versie van het rapport — alleen zichtbaar bij window.print() */}
-      {showResult && (
-        <RapportPrint
-          state={state}
-          maxLoan={maxLoan}
-          begroting={begroting}
-          ibl1={ibl1}
-          ibl2={ibl2}
-        />
-      )}
     </>
+  );
+}
+
+// ============================================================
+// DOSSIER TOOLBAR (Upload / Bewaar / Print)
+// ============================================================
+
+function DossierToolbar({ variant, showResult, triggerUpload, handleSaveDossier }) {
+  const isBottom = variant === 'bottom';
+  return (
+    <div className={`dossier-toolbar${isBottom ? ' dossier-toolbar-bottom' : ''}`}>
+      <div className="container dossier-toolbar-inner">
+        <button
+          type="button"
+          className="dossier-action"
+          onClick={triggerUpload}
+          title="Een eerder bewaard dossier-bestand inladen"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload dossier
+        </button>
+        <button
+          type="button"
+          className="dossier-action"
+          onClick={handleSaveDossier}
+          title="Sla het huidige dossier op als bestand"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Bewaar dossier
+        </button>
+        {showResult && (
+          <button
+            type="button"
+            className="dossier-action dossier-action-print"
+            onClick={() => window.print()}
+            title="Druk het rapport af of bewaar als PDF"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print rapport
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -1395,184 +1409,6 @@ function Result({ state, pct, maxLoan, begroting, ibl1, ibl2 }) {
         koop-/aanneemovereenkomst nodig.
       </div>
     </div>
-  );
-}
-
-// ============================================================
-// RAPPORT PRINT — clean A4-layout voor afdrukken / PDF-export
-// ============================================================
-
-function RapportPrint({ state, maxLoan, begroting, ibl1, ibl2 }) {
-  const fullName = (vn, tv, an) => [vn, tv, an].filter(Boolean).join(' ').trim();
-  const a1Naam = fullName(state.a1Voornaam, state.a1Tussenvoegsel, state.a1Achternaam) || '—';
-  const a2Naam = state.samen === 'ja'
-    ? (fullName(state.a2Voornaam, state.a2Tussenvoegsel, state.a2Achternaam) || '—')
-    : null;
-  const datum = new Date().toLocaleDateString('nl-NL', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
-  const dossierTitel = a2Naam
-    ? `${state.a1Achternaam || 'Dossier'} & ${state.a2Achternaam || ''}`
-    : (state.a1Achternaam || 'Dossier');
-
-  const tekort = begroting.saldo < 0;
-
-  return (
-    <section className="rapport-print" aria-label="Afdrukbaar rapport">
-      <div className="rapport-header">
-        <div>
-          <div className="rapport-title">Hypotheekdossier</div>
-          <div style={{ fontSize: '11pt', marginTop: '4px' }}>{dossierTitel}</div>
-        </div>
-        <div className="rapport-date">{datum}</div>
-      </div>
-
-      <div className="rapport-highlight">
-        <div className="lbl">Indicatieve maximale hypotheek</div>
-        <div className="val">{fmtCur(maxLoan)}</div>
-      </div>
-
-      <div className={tekort ? 'rapport-warn' : 'rapport-positief'}>
-        <strong>{tekort ? '⚠ Tekort: ' : '✓ Ruimte: '}</strong>
-        {tekort
-          ? 'Het beschikbare bedrag is onvoldoende voor de aankoop. Bekijk de opties met een adviseur.'
-          : 'Het beschikbare bedrag dekt de aankoop. Houd rekening met onvoorziene kosten.'}
-        {' '}Bedrag: <strong>{fmtCur(Math.abs(begroting.saldo))}</strong>
-      </div>
-
-      <div className="rapport-section">
-        <h3>Persoonlijke gegevens</h3>
-        <dl className="rapport-grid">
-          <dt>Aanvrager 1</dt><dd>{a1Naam}</dd>
-          {state.a1Geboorte && <><dt>Geboortedatum</dt><dd>{state.a1Geboorte}</dd></>}
-          {state.a1Email && <><dt>E-mailadres</dt><dd>{state.a1Email}</dd></>}
-          {state.a1Telefoon && <><dt>Telefoon</dt><dd>{state.a1Telefoon}</dd></>}
-          {(state.a1Postcode || state.a1Straat) && (
-            <>
-              <dt>Adres</dt>
-              <dd>
-                {state.a1Straat} {state.a1Huisnr}{state.a1Toevoeging}
-                {(state.a1Postcode || state.a1Plaats) && <>, {state.a1Postcode} {state.a1Plaats}</>}
-              </dd>
-            </>
-          )}
-          {a2Naam && (
-            <>
-              <dt>Aanvrager 2</dt><dd>{a2Naam}</dd>
-              {state.a2Geboorte && <><dt>Geboortedatum</dt><dd>{state.a2Geboorte}</dd></>}
-              {state.a2Email && <><dt>E-mailadres</dt><dd>{state.a2Email}</dd></>}
-            </>
-          )}
-        </dl>
-      </div>
-
-      <div className="rapport-section">
-        <h3>De aan te kopen woning</h3>
-        <dl className="rapport-grid">
-          <dt>Koop-/aanneemsom</dt><dd>{fmtCur(num(state.koopsom))}</dd>
-          {num(state.meerwerk) > 0 && <><dt>Meerwerk</dt><dd>{fmtCur(num(state.meerwerk))}</dd></>}
-          {state.energielabel && <><dt>Energielabel</dt><dd>{state.energielabel}</dd></>}
-          <dt>Type</dt><dd>{state.aankoopType === 'nieuwbouw' ? 'Nieuwbouw' : 'Bestaande bouw'}</dd>
-          {state.oplevering && <><dt>Oplevering</dt><dd>{state.oplevering}</dd></>}
-          {state.huidigeWonen && (
-            <><dt>Huidige woonsituatie</dt><dd>{HUIDIG_WONEN_OPTIONS.find(o => o.v === state.huidigeWonen)?.l || state.huidigeWonen}</dd></>
-          )}
-        </dl>
-      </div>
-
-      <div className="rapport-section">
-        <h3>Inkomen &amp; verplichtingen</h3>
-        <dl className="rapport-grid">
-          <dt>Bruto inkomen aanvrager 1</dt>
-          <dd>
-            {fmtCur(num(state.brutoA1))}
-            {state.contractA1 && ` · ${CONTRACT_LABELS[state.contractA1] || state.contractA1}`}
-            {ibl1 && ' · IBL-toetsinkomen berekend'}
-          </dd>
-          {state.samen === 'ja' && (
-            <>
-              <dt>Bruto inkomen aanvrager 2</dt>
-              <dd>
-                {fmtCur(num(state.brutoA2))}
-                {state.contractA2 && ` · ${CONTRACT_LABELS[state.contractA2] || state.contractA2}`}
-                {ibl2 && ' · IBL-toetsinkomen berekend'}
-              </dd>
-            </>
-          )}
-          {state.studie1Heeft === 'ja' && (
-            <><dt>Studieschuld A1</dt><dd>Hoofdsom {fmtCur(num(state.studie1Hoofdsom))} · rest {fmtCur(num(state.studie1Rest))}</dd></>
-          )}
-          {state.studie2Heeft === 'ja' && (
-            <><dt>Studieschuld A2</dt><dd>Hoofdsom {fmtCur(num(state.studie2Hoofdsom))} · rest {fmtCur(num(state.studie2Rest))}</dd></>
-          )}
-          {state.heeftLening === 'ja' && (
-            <><dt>Lening</dt><dd>{fmtCur(num(state.leningBedrag))} · maandlast {fmtCur(num(state.leningMaand))}</dd></>
-          )}
-          {state.heeftBkr === 'ja' && (
-            <><dt>BKR-limiet</dt><dd>{fmtCur(num(state.bkrLimit))}</dd></>
-          )}
-          {state.heeftLease === 'ja' && (
-            <><dt>Lease</dt><dd>Maandlast {fmtCur(num(state.leaseMaand))}</dd></>
-          )}
-          {state.heeftAlimentatie === 'ja' && (
-            <>
-              <dt>Alimentatie</dt>
-              <dd>
-                {num(state.alimPartner) > 0 && `Partner ${fmtCur(num(state.alimPartner))}`}
-                {num(state.alimPartner) > 0 && num(state.alimKind) > 0 && ' · '}
-                {num(state.alimKind) > 0 && `Kind ${fmtCur(num(state.alimKind))}`}
-              </dd>
-            </>
-          )}
-        </dl>
-      </div>
-
-      <div className="rapport-section">
-        <h3>Aankoopbegroting — Financieringsbehoefte</h3>
-        <table className="rapport-kk">
-          <tbody>
-            <tr><td>Koop-/aanneemsom</td><td>{fmtCur(begroting.koopsom)}</td></tr>
-            {begroting.meerwerk > 0 && <tr><td>Meerwerk</td><td>{fmtCur(begroting.meerwerk)}</td></tr>}
-            {!begroting.isNieuwbouw && begroting.ob > 0 && (
-              <tr><td>Overdrachtsbelasting (2%)</td><td>{fmtCur(begroting.ob)}</td></tr>
-            )}
-            <tr><td>Notaris- en leveringskosten</td><td>{fmtCur(begroting.notaris)}</td></tr>
-            {!begroting.isNieuwbouw && (
-              <tr><td>Taxatiekosten</td><td>{fmtCur(begroting.tax)}</td></tr>
-            )}
-            <tr><td>Advies- en bemiddelingskosten</td><td>{fmtCur(begroting.advies)}</td></tr>
-            <tr><td>NHG borgstellingsprovisie (0,4%)</td><td>{fmtCur(begroting.nhg)}</td></tr>
-            {begroting.isNieuwbouw && (
-              <tr><td>Renteverlies tijdens de bouw</td><td>{fmtCur(begroting.bouw)}</td></tr>
-            )}
-            <tr><td>Reservering dubbele woonlasten</td><td>{fmtCur(begroting.dubbel)}</td></tr>
-            <tr className="total"><td>Totaal benodigd</td><td>{fmtCur(begroting.totaalBehoefte)}</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div className="rapport-section">
-        <h3>Aankoopbegroting — Financieringsmiddelen</h3>
-        <table className="rapport-kk">
-          <tbody>
-            <tr><td>Indicatieve maximale hypotheek</td><td>{fmtCur(maxLoan)}</td></tr>
-            <tr><td>Spaargeld</td><td>{fmtCur(num(state.spaargeld))}</td></tr>
-            {num(state.schenking) > 0 && <tr><td>Schenking van familie</td><td>{fmtCur(num(state.schenking))}</td></tr>}
-            {state.huidigeWonen === 'koop' && num(state.overwaarde) > 0 && (
-              <tr><td>Overwaarde huidige woning</td><td>{fmtCur(num(state.overwaarde))}</td></tr>
-            )}
-            <tr className="total"><td>Totaal beschikbaar</td><td>{fmtCur(begroting.totaalMiddelen)}</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div className="rapport-footer">
-        Dit is een indicatief overzicht conform NIBUD/AFM-normen 2026 en IBL-rekenregels 8.1.1.
-        Geen bindend financieel advies. Voor een definitieve toets zijn salarisstroken,
-        werkgeversverklaring en de koop-/aanneemovereenkomst nodig.
-        Gegenereerd door Dossiercompleet + IBL op {datum}.
-      </div>
-    </section>
   );
 }
 
